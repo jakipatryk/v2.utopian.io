@@ -26,6 +26,25 @@ export const searchGithubRepository = (store, query) => {
 }
 
 /**
+ * Get contribution by author and permlink.
+ *
+ * @param author
+ * @param permlink
+ *
+ * @return {Promise<firebase.firestore.QuerySnapshot>}
+ */
+export const getContribution = (author, permlink) => {
+  // alias db.
+  const db = firebase.firestore()
+
+  // get contribution from database using author and permlink.
+  return db.collection('contributions')
+    .where('author', '==', author)
+    .where('permlink', '==', permlink)
+    .get()
+}
+
+/**
  * Save contributions on database.
  *
  * @param store
