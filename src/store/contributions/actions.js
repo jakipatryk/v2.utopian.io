@@ -3,6 +3,8 @@
 // imports.
 import firebase from 'firebase/app'
 import { githubClient, makeSearchOptions, mapGithubResults } from 'src/services/github'
+// lodash helpers.
+import { toString, first } from 'lodash-es'
 
 export const loadDrafts = ({ commit, getters, dispatch, rootGetters }) => {
   // console.log(rootGetters)
@@ -28,20 +30,23 @@ export const searchGithubRepository = (store, query) => {
 /**
  * Get contribution by author and permlink.
  *
+ * @param store
  * @param author
  * @param permlink
  *
  * @return {Promise<firebase.firestore.QuerySnapshot>}
  */
-export const getContribution = (author, permlink) => {
+export const getContribution = (store, { author, permlink }) => {
   // alias db.
   const db = firebase.firestore()
 
   // get contribution from database using author and permlink.
   return db.collection('contributions')
-    .where('author', '==', author)
+    .where('author', '==', toString(author).replace('@', ''))
     .where('permlink', '==', permlink)
     .get()
+    .then(snapshot => first(snapshot.docs))
+    .then(doc => doc ? doc.data() : null)
 }
 
 /**

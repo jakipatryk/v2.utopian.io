@@ -59,6 +59,7 @@ export default {
 
     // map contributions store actions.
     ...mapActions('contributions', [
+      'getContribution',
       'searchGithubRepository'
     ]),
 
@@ -127,6 +128,11 @@ export default {
   },
 
   mounted () {
+    // get author and permlink from route.
+    const author = get(this.$route.params, 'author')
+    const permlink = get(this.$route.params, 'permlink')
+
+    this.getContribution({ author, permlink }).then(console.log)
     // require a ton of plugins to initialize ace.
     require('emmet-core/emmet')
     require('brace/ext/emmet')
