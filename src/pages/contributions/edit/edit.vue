@@ -54,7 +54,7 @@ export default {
 
     // map steem store actions.
     ...mapActions('steem', [
-      'comment'
+      'updateComment'
     ]),
 
     // map contributions store actions.
@@ -65,7 +65,7 @@ export default {
 
     // broadcast (save) the contribution / post on the blockchain.
     saveContribution () {
-      return this.comment({
+      return this.updateComment({
         title: get(this.contribution, 'title', null),
         content: get(this.contribution, 'body', ''),
         tags: get(this.contribution, 'tags', []),
