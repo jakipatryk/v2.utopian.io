@@ -82,6 +82,12 @@ export default [
         meta: {weight: 10}
       },
       {
+        path: 'contributions/:author/:permlink/edit',
+        name: 'contributions.edit',
+        component: () => import('src/pages/contributions/edit/edit'),
+        meta: {weight: 10}
+      },
+      {
         path: 'settings',
         name: 'settings',
         component: () => import('src/pages/settings/settings'),
