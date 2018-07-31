@@ -57,5 +57,23 @@ export const generateOperations = (author, title, permlink = null, body = '', js
   // return this.broadcast([['comment', params]], cb);
 }
 
+export const generateUpdateOperations = (author, title, permlink = null, body = '', jsonMetadata = {}) => {
+  // build comment data.
+  let commentData = {
+    parent_author: '',
+    parent_permlink: 'utopian-io',
+    author: author,
+    permlink: permlink,
+    title: title,
+    body: body,
+    json_metadata: JSON.stringify(jsonMetadata)
+  }
+  // build comment operation array.
+  const comment = ['comment', commentData]
+
+  // return both operations to be broadcast at once.
+  return [comment]
+}
+
 // title slug.
 export const slugifyTitle = (title) => slugify(title, { lower: true })
