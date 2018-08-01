@@ -2,29 +2,13 @@
 
 // imports.
 import firebase from 'firebase/app'
-import { githubClient, makeSearchOptions, mapGithubResults } from 'src/services/github'
+import { queryBuilder } from 'src/services/firebase/firestore/query'
 // lodash helpers.
 import { toString, first } from 'lodash-es'
+import { parsePost } from 'src/services/steem/parsers/post'
 
 export const loadDrafts = ({ commit, getters, dispatch, rootGetters }) => {
   // console.log(rootGetters)
-}
-
-/**
- * Github repository search.
- *
- * @TODO remove to a common / github only store.
- *
- * @param store
- * @param query
- *
- * @return {Promise<T | Array>}
- */
-export const searchGithubRepository = (store, query) => {
-  return githubClient.search
-    .repos(makeSearchOptions(query))
-    .then(mapGithubResults)
-    .catch(() => ([]))
 }
 
 /**
@@ -47,6 +31,38 @@ export const getContribution = (store, { author, permlink }) => {
     .get()
     .then(snapshot => first(snapshot.docs))
     .then(doc => doc ? doc.data() : null)
+}
+
+/**
+ * Get contribution by author and permlink.
+ *
+ * @param store
+ * @param query - example: [['author', '==', 'icaro']]
+ * @param orderBy - example: [['created', 'desc']]
+ *
+ * @return {Promise<firebase.firestore.QuerySnapshot>}
+ */
+export const getContributions = (store, { query = [], orderBy = 'trending', limit = 20, post }) => {
+  // alias db.
+
+  let orderByParams = [[]]
+  if (orderBy === 'trending') {
+    orderByParams = [['pending_payout_value', 'desc'], ['created', 'desc']]
+  } else if ((orderBy === 'new')) {
+    orderByParams = [['created', 'desc'], ['pending_payout_value', 'desc']]
+  } 
+
+  let startAfterParams = []
+  startAfterParams = orderByParams.map(param => post[param[0]]).filter(startAfter => startAfter !== undefined)
+
+  return queryBuilder({
+    collection: 'contributions',
+    query,
+    orderBy: orderByParams,
+    limit,
+    startAfter: startAfterParams,
+    responseParser: parsePost
+  })
 }
 
 /**

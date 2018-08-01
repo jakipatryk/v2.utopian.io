@@ -42,8 +42,8 @@ u-layout-page.u-page-index
   template(slot="main")
     q-infinite-scroll(:handler="loadPostsScroll", ref="infiniteScroll")
       q-list.flex.posts-list(padding, separator, sparse, no-border, multiline)
-        template(v-for="item in visiblePosts", v-if="item.parent_permlink === 'utopian-io' && item._category")
-          u-post-preview.shadow-2(:post="item")
+        template(v-for="post in posts", v-if="post.parent_permlink === 'utopian-io' && post._category")
+          u-post-preview.shadow-2(:post="post")
 
       // spinner for infinite scroll loading.
       q-spinner-dots(slot="message", :size="40", style="margin: 0 auto")

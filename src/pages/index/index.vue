@@ -1,8 +1,8 @@
 <script>
 import ULayoutPage from 'src/layouts/parts/page/page'
 import UPostPreview from 'src/components/post-preview/post-preview'
-import { byOrder } from 'src/services/steem/posts'
-import { concat, last, attempt, filter, map } from 'lodash-es'
+// import { byOrder } from 'src/services/steem/posts'
+import { attempt, filter } from 'lodash-es'
 
 export default {
   name: 'PageIndex',
@@ -72,25 +72,25 @@ export default {
       return this.$router.push({ name: 'project.details', params: { name } })
     },
     loadContributions (done) {
-      return byOrder('trending', { tag: 'utopian-io', limit: 10 }, last(this.posts))
-        .then((result) => {
-          this.contributions = concat(this.contributions, result)
-          attempt(done)
-          return result
-        })
+      // return byOrder('trending', { tag: 'utopian-io', limit: 10 }, last(this.posts))
+      //   .then((result) => {
+      //     this.contributions = concat(this.contributions, result)
+      //     attempt(done)
+      //     return result
+      //   })
     },
     loadTaskRequests (done) {
-      const filterTags = ['task-bug-hunting', 'task-analysis', 'task-social',
-        'task-development', 'task-documentation', 'task-copywriting', 'task-graphics']
+      // const filterTags = ['task-bug-hunting', 'task-analysis', 'task-social',
+      //   'task-development', 'task-documentation', 'task-copywriting', 'task-graphics']
 
-      //  map over the task tags and grab associated tasks.
-      //  lowering limit reduces the potential for multiple tasks by same author to appear on the carousel
+      // //  map over the task tags and grab associated tasks.
+      // //  lowering limit reduces the potential for multiple tasks by same author to appear on the carousel
 
-      return map(filterTags, (tag) => byOrder('trending', { tag: tag, limit: 2 }, last(this.posts)).then((result) => {
-        this.taskRequests = concat(this.taskRequests, result)
-        attempt(done)
-        return result
-      }))
+      // return map(filterTags, (tag) => byOrder('trending', { tag: tag, limit: 2 }, last(this.posts)).then((result) => {
+      //   this.taskRequests = concat(this.taskRequests, result)
+      //   attempt(done)
+      //   return result
+      // }))
     },
     redirectToCreateProject () {
       return this.$router.push({ name: 'project.create' })
@@ -121,12 +121,12 @@ export default {
   watch: {
     visibleContributions () {
       if (this.visibleContributions.length < 3) {
-        this.loadInitial()
+        // this.loadInitial()
       }
     },
     visibleTaskRequests () {
       if (this.visibleTaskRequests.length < 3) {
-        this.loadInitial()
+        // this.loadInitial()
       }
     }
   }
