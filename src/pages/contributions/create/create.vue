@@ -85,7 +85,7 @@ export default {
         this.$router.push({ path: redirect })
       } catch (err) {
         this.stopLoading()
-        this.showDialog('Oops :(', 'We couldn\'t save your contribution. Please try again.')
+        this.showDialog({ title: 'Oops :(', message: 'We couldn\'t save your contribution. Please try again.' })
       }
     },
 

@@ -1,5 +1,5 @@
 // imports.
-import { get, attempt, find, filter, map } from 'lodash-es'
+import { get, find, filter, map } from 'lodash-es'
 import { categories, tasks } from 'src/services/utopian/categories'
 import { parseCurrencyString } from 'src/services/currencies/formatter'
 import { formatReputation } from 'src/services/steem/account'
@@ -12,19 +12,17 @@ const getValue = (post, field, otherwise = null, transform = null) => {
   return (transform !== null) ? transform(value) : value
 }
 
-const decodeMeta = (postMeta) => attempt(() => JSON.parse(postMeta), {}) || {}
-
 // post parser.
 export const parsePost = (post) => {
   // parse metadata.
-  post._meta = getValue(post, 'json_metadata', '{}', decodeMeta)
+  post._meta = getValue(post, 'json_metadata', {})
 
   // parse tags.
   post._tags = getValue(post, '_meta.tags', [])
   post._image = getValue(post, '_meta.image', [])
 
   // parse category.
-  post._category = find(post._tags, (tag) => categories.indexOf(tag) !== -1)
+  post._category = getValue(post, '_meta.utopian.category', '')
 
   // parse task-category
   post._task = find(post._tags, (tag) => tasks.includes(tag))
