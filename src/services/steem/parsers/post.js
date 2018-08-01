@@ -64,7 +64,7 @@ export const parsePost = (post) => {
   post._payout_value = post._total_payout_value + post._pending_payout_value
   // avatar helper.
   post._author_avatar = 'https://steemitimages.com/u/' + get(post, 'author') + '/avatar'
-  post._paid = get(post, 'cashout_time', '').indexOf('1969') !== -1
+  post._paid = get(post, 'cashout_time', '')
   // parsed author reputation.
   post._author_reputation = formatReputation(get(post, 'author_reputation'))
 

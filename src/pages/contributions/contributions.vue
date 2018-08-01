@@ -2,7 +2,7 @@
 <script>
 // imports.
 import moment from 'moment'
-import { map, get, filter, attempt, debounce, concat } from 'lodash-es'
+import { map, get, filter, attempt, debounce } from 'lodash-es'
 // import { byOrder } from 'src/services/steem/posts'
 import UPostPreview from 'src/components/post-preview/post-preview'
 import ULayoutPage from 'src/layouts/parts/page/page'
@@ -73,15 +73,23 @@ export default {
     // load posts main method.
     async loadPosts (done) {
       const contributionsRef = this.firestore.collection('contributions')
-
-      const querySnapshot = await contributionsRef.where('json_metadata.utopian.category', '==', this.$route.params.category).get()
-
-      const vm = this
+      const param = this.$route.params.category
+      console.log(param)
+      let querySnapshot
+      if (typeof param !== 'undefined') {
+        querySnapshot = await contributionsRef.where('json_metadata.utopian.category', '==', this.$route.params.category).get()
+      } else {
+        querySnapshot = await contributionsRef.get()
+      }
+      this.posts = []
+      let res = []
       querySnapshot.forEach(post => {
-        vm.posts = concat(vm.posts, parsePost(post.data()))
+        res.push({ id: post.id, data: parsePost(post.data()) })
       })
-      attempt(done)
+      this.posts = res
       this.$refs.infiniteScroll.stop()
+      console.log(this.posts)
+      attempt(done)
       return this.posts
       // // get order and current tag from route.
       // const order = get(this.$route, 'meta.order', 'trending')
