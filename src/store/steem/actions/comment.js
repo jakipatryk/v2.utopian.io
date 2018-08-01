@@ -37,7 +37,12 @@ export const comment = async ({ getters, dispatch, rootGetters }, {
     .then((client) => client.broadcast(operations))
     // save on database (call the API).
     .then(() => {
-      getContent(author, finalPermlink).then((post) => dispatch('storeContribution', post))
+      getContent(author, finalPermlink).then((post) => {
+        post.json_metadata = JSON.parse(post.json_metadata)
+        dispatch('storeContribution', post).then(() => {
+          return post.url
+        })
+      })
     })
 }
 

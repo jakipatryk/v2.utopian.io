@@ -1,8 +1,6 @@
 // import lodash helpers.
 import { get, merge, toNumber } from 'lodash-es'
-// slugify helper.
-import slugify from 'slugify'
-
+import { slugify } from 'src/services/common/string'
 // base metadata fields.
 export const baseMetadata = {
   app: 'utopian/2.0',
@@ -76,4 +74,4 @@ export const generateUpdateOperations = (author, title, permlink = null, body = 
 }
 
 // title slug.
-export const slugifyTitle = (title) => slugify(title, { lower: true })
+export const slugifyTitle = (title) => slugify(title)

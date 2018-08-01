@@ -70,7 +70,12 @@ export default {
     }, 3000),
 
     // load posts main method.
-    loadPosts (done) {
+    async loadPosts (done) {
+      // const contributionsRef = this.firestore.collection('contributions')
+
+      // const querySnapshot = await contributionsRef.where('id', '==', this.$route.params.name).get()
+
+      // this.project = querySnapshot.docs[0].data()
       // get order and current tag from route.
       const order = get(this.$route, 'meta.order', 'trending')
       const tag = get(this.$route, 'params.category', 'utopian-io')

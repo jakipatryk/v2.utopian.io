@@ -50,6 +50,11 @@ export default {
 
   // component methods.
   methods: {
+    ...mapActions([
+      'showDialog',
+      'startLoading',
+      'stopLoading'
+    ]),
 
     // map steem store actions.
     ...mapActions('steem', [
@@ -62,18 +67,26 @@ export default {
     ]),
 
     // broadcast (save) the contribution / post on the blockchain.
-    saveContribution () {
-      return this.comment({
-        title: get(this.contribution, 'title', null),
-        tags: [get(this.contribution, 'category', 'development')].push(
-          get(this.contribution, 'tags', [])
-        ),
-        body: this.body,
-        meta: {
-          category: get(this.contribution, 'category', 'development'),
-          projectId: get(this.contribution, 'projectId', null)
-        }
-      }).catch(console.log)
+    async saveContribution () {
+      this.startLoading('Saving your contribution')
+      try {
+        const redirect = await this.comment({
+          title: get(this.contribution, 'title', null),
+          tags: [get(this.contribution, 'category', 'development')].concat(
+            get(this.contribution, 'tags', [])
+          ),  
+          body: this.body,
+          meta: {
+            category: get(this.contribution, 'category', 'development'),
+            projectId: get(this.contribution, 'projectId', null)
+          }
+        })
+        this.stopLoading()
+        this.$router.push({ path: redirect })
+      } catch (err) {
+        this.stopLoading()
+        this.showDialog('Oops :(', 'We couldn\'t save your contribution. Please try again.')
+      }
     },
 
     // search github for repositories matching a given query.
