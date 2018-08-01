@@ -10,12 +10,14 @@ import {
   generateUpdateOperations
 } from 'src/services/steem/connect/comment'
 
+import { getContent } from 'src/services/steem/posts'
+
 // broadcast a vote to steem through steem connect.
 export const comment = async ({ getters, dispatch, rootGetters }, {
   title,
   permlink = null,
   tags = [],
-  content = '',
+  body = '',
   meta = {}
 }) => {
   // get username from root store.
@@ -28,13 +30,15 @@ export const comment = async ({ getters, dispatch, rootGetters }, {
   const finalPermlink = permlink || slugifyTitle(title)
 
   // generate the operations.
-  const operations = generateOperations(author, title, finalPermlink, content, metadata)
+  const operations = generateOperations(author, title, finalPermlink, body, metadata)
   // prepare client.
   return dispatch('prepareClient')
     // broadcast the operation,
     .then((client) => client.broadcast(operations))
     // save on database (call the API).
-    .then(() => dispatch('storeContribution', { author: author, permlink: finalPermlink }))
+    .then(() => {
+      getContent(author, finalPermlink).then((post) => dispatch('storeContribution', post))
+    })
 }
 
 // update a comment
@@ -42,7 +46,7 @@ export const updateComment = async ({ getters, dispatch, rootGetters }, {
   title,
   permlink = null,
   tags = [],
-  content = '',
+  body = '',
   meta = {}
 }) => {
   // get username from root store.
@@ -55,7 +59,7 @@ export const updateComment = async ({ getters, dispatch, rootGetters }, {
   const finalPermlink = permlink || slugifyTitle(title)
 
   // generate the operations.
-  const operations = generateUpdateOperations(author, title, finalPermlink, content, metadata)
+  const operations = generateUpdateOperations(author, title, finalPermlink, body, metadata)
   // prepare client.
   return dispatch('prepareClient')
   // broadcast the operation,
@@ -65,9 +69,9 @@ export const updateComment = async ({ getters, dispatch, rootGetters }, {
 }
 
 // broadcast a vote to steem through steem connect.
-export const storeContribution = async ({ getters, dispatch, rootGetters }, { author, permlink = null }) => {
+export const storeContribution = async ({ getters, dispatch, rootGetters }, contribution) => {
   // alias the backend method for saving the contribution
   const saveContributionMethod = firebase.functions().httpsCallable('api/contributions/save')
   // save the contribution.
-  return saveContributionMethod({ contribution: { author, permlink } })
+  return saveContributionMethod(contribution)
 }

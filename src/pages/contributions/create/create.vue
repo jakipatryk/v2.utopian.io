@@ -34,7 +34,6 @@ export default {
       contribution: {
         category: 'development',
         title: '',
-        body: '',
         projectId: null,
         rewards: [0.5, 0.5],
         tags: []
@@ -66,8 +65,10 @@ export default {
     saveContribution () {
       return this.comment({
         title: get(this.contribution, 'title', null),
-        content: get(this.contribution, 'body', ''),
-        tags: get(this.contribution, 'tags', []),
+        tags: [get(this.contribution, 'category', 'development')].push(
+          get(this.contribution, 'tags', [])
+        ),
+        body: this.body,
         meta: {
           category: get(this.contribution, 'category', 'development'),
           projectId: get(this.contribution, 'projectId', null)

@@ -10,7 +10,7 @@ export const baseMetadata = {
 }
 
 // metadata generator.
-export const generateMetadata = (meta, tags) => merge(merge(baseMetadata, meta), { tags })
+export const generateMetadata = (meta, tags) => merge(merge(baseMetadata, { utopian: meta }), { tags })
 
 export const generateOperations = (author, title, permlink = null, body = '', jsonMetadata = {}) => {
   // build comment data.
