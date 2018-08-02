@@ -10,7 +10,6 @@ import firebase from 'firebase/app'
  */
 export const queryBuilder = ({ collection = '', query = [], orderBy = [], limit = 20, startAfter = [], responseParser = obj => obj }) => {
   const db = firebase.firestore()
-  console.log(orderBy, startAfter)
   let queryBuilder = db.collection(collection)
 
   if (query.length > 0) {
@@ -33,7 +32,6 @@ export const queryBuilder = ({ collection = '', query = [], orderBy = [], limit 
   }
 
   queryBuilder = queryBuilder.limit(limit)
-  console.log(queryBuilder)
   return queryBuilder
     .get()
     .then(snapshot => {

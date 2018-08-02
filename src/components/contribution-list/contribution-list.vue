@@ -4,11 +4,16 @@
 import moment from 'moment'
 import { get, attempt, debounce, last, concat } from 'lodash-es'
 import { mapActions } from 'vuex'
+import UPostPreview from 'src/components/post-preview/post-preview'
 
 // default component export.
 export default {
   // component name.
   name: 'u-contribution-list',
+
+  components: {
+    UPostPreview
+  },
 
   props: {
     limit: {
@@ -16,8 +21,8 @@ export default {
       default: 20
     },
     customQuery: {
-      type: () => [],
-      default: []
+      type: Array,
+      default: () => []
     },
     category: {
       type: String,
@@ -40,7 +45,7 @@ export default {
     return {
       posts: [],
       loading: false,
-      query: []
+      noPosts: false
     }
   },
 
@@ -57,6 +62,11 @@ export default {
     ...mapActions('contributions', [
       'getContributions'
     ]),
+    stopScroll () {
+      if (this.$refs.infiniteScroll) {
+        this.$refs.infiniteScroll.stop()
+      }
+    },
     // initial content loading.
     loadInitial () {
       // start loading as true.
@@ -66,6 +76,12 @@ export default {
         // disable the loading indicator
         this.loading = false
         // return the results to complete the promise.
+        if (this.posts.length === 0) {
+          this.noPosts = true
+          this.stopScroll()
+        } else {
+          this.noPosts = false
+        }
         return result
       })
     },
@@ -73,13 +89,13 @@ export default {
     // debounced post loading (paginated).
     loadPostsScroll: debounce(function (index, done) {
       return this.loadPosts(done)
-    }, 3000),
+    }, 2000),
 
     // load posts main method.
     async loadPosts (done) {
       const limit = this.limit
-      const query = this.customQuery
-        ? this.customQuery : this.buildQuery({ category: this.category })
+      const query = this.customQuery.length > 0
+        ? this.customQuery : this.buildQuery({ category: this.category, projectId: this.projectId })
 
       const orderBy = get(this.$route, 'meta.order', 'trending')
 
@@ -93,24 +109,28 @@ export default {
         // small hack top prevent infinite loop.
         if (result.length < limit) {
           attempt(done)
-          this.$refs.infiniteScroll.stop()
+          this.stopScroll()
         } else {
           attempt(done)
         }
       } catch (err) {
+        console.error(err)
+        this.noPosts = true
         attempt(done)
-        this.$refs.infiniteScroll.stop()
+        this.stopScroll()
       }
     },
-    buildQuery () {
-      this.query = []
-      if (this.category) {
-        this.query.concat(['json_metadata.utopian.category', '==', this.category])
+    buildQuery ({ category, projectId }) {
+      let query = []
+      if (category && category !== 'all') {
+        query = query.concat([['json_metadata.utopian.category', '==', category]])
       }
 
-      if (this.projectId) {
-        this.query.concat(['json_metadata.utopian.projectId', '==', this.projectId])
+      if (projectId) {
+        query = query.concat([['json_metadata.utopian.projectId', '==', projectId]])
       }
+
+      return query
     }
   },
 
@@ -119,30 +139,12 @@ export default {
 
   mounted () {
     this.loadInitial()
-  },
-
-  // watchers.
-  watch: {
-
-    // reload the data as the category changes.
-    category () {
-      this.loadInitial()
-    },
-    projectId () {
-      this.loadInitial()
-    },
-    orderBy () {
-      this.loadInitial()
-    },
-    customQuery () {
-      this.loadInitial()
-    }
   }
 }
 </script>
 
 <!-- component style. -->
-<style lang="stylus" src="./contributions.styl"></style>
+<style lang="stylus" src="./contribution-list.styl"></style>
 
 <!-- component template. -->
-<template lang="pug" src="./contributions.pug"></template>
+<template lang="pug" src="./contribution-list.pug"></template>
