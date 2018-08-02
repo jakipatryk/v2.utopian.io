@@ -47,9 +47,9 @@ export const getContributions = (store, { query = [], orderBy = 'trending', limi
 
   let orderByParams = [[]]
   if (orderBy === 'trending') {
-    orderByParams = [['pending_payout_value', 'desc'], ['created', 'desc']]
+    orderByParams = [['pending_payout_value', 'desc'], ['created', 'desc'], ['permlink', 'asc']]
   } else if ((orderBy === 'new')) {
-    orderByParams = [['created', 'desc'], ['pending_payout_value', 'desc']]
+    orderByParams = [['created', 'desc'], ['pending_payout_value', 'desc'], ['permlink', 'asc']]
   } 
 
   let startAfterParams = []
