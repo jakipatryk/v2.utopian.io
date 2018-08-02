@@ -81,7 +81,7 @@ div
     //-             q-btn.col-12(color="primary") see all
 
     template(slot="main")
-      router-view(v-if="project.details", :details="project.details")
+      router-view(v-if="project.details", :details="project.details", :project="project")
 
 
 

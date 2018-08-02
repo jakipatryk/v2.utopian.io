@@ -105,7 +105,6 @@ export default {
       try {
         const result = await this.getContributions({ query, orderBy, limit, post })
         this.posts = concat(this.posts, result)
-
         // small hack top prevent infinite loop.
         if (result.length < limit) {
           attempt(done)
@@ -115,7 +114,6 @@ export default {
         }
       } catch (err) {
         console.error(err)
-        this.noPosts = true
         attempt(done)
         this.stopScroll()
       }

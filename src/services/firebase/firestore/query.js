@@ -11,7 +11,6 @@ import firebase from 'firebase/app'
 export const queryBuilder = ({ collection = '', query = [], orderBy = [], limit = 20, startAfter = [], responseParser = obj => obj }) => {
   const db = firebase.firestore()
   let queryBuilder = db.collection(collection)
-
   if (query.length > 0) {
     query.forEach(condition => {
       queryBuilder = queryBuilder.where(...condition)
@@ -41,5 +40,5 @@ export const queryBuilder = ({ collection = '', query = [], orderBy = [], limit 
       })
       return posts
     })
-    .catch(err => err)
+    .catch(err => { throw err })
 }
