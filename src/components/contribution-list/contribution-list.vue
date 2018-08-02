@@ -2,42 +2,45 @@
 <script>
 // imports.
 import moment from 'moment'
-import { map, get, attempt, debounce, last, concat } from 'lodash-es'
-// import { byOrder } from 'src/services/steem/posts'
-import UPostPreview from 'src/components/post-preview/post-preview'
-import ULayoutPage from 'src/layouts/parts/page/page'
-import { categories, categoryOptions } from 'src/services/utopian/categories'
+import { get, attempt, debounce, last, concat } from 'lodash-es'
 import { mapActions } from 'vuex'
 
 // default component export.
 export default {
   // component name.
-  name: 'u-page-contributions',
+  name: 'u-contribution-list',
 
-  // child components.
-  components: {
-    UPostPreview,
-    ULayoutPage
+  props: {
+    limit: {
+      type: Number,
+      default: 20
+    },
+    customQuery: {
+      type: () => [],
+      default: []
+    },
+    category: {
+      type: String,
+      default: ''
+    },
+    projectId: {
+      type: String,
+      default: ''
+    },
+    orderBy: {
+      validator: function (value) {
+        // The value must match one of these strings
+        return ['trending', 'new'].indexOf(value) !== -1
+      },
+      default: 'trending'
+    }
   },
-
   // component data.
   data () {
     return {
-      // page sort.
-      sortBy: 'trending',
-      // page sort options.
-      sortOptions: [
-        { label: 'Trending', value: 'trending' },
-        { label: 'New', value: 'new' }
-      ],
-      // loading state indicator.
-      loading: false,
-      // currently selected category.
-      category: 'utopian-io',
-      // loaded contributions / posts.
       posts: [],
-      // current search.
-      search: ''
+      loading: false,
+      query: []
     }
   },
 
@@ -74,9 +77,9 @@ export default {
 
     // load posts main method.
     async loadPosts (done) {
-      const limit = 2
-      const query = this.$route.params.category && this.$route.params.category !== 'utopian-io'
-        ? [['json_metadata.utopian.category', '==', this.$route.params.category]] : []
+      const limit = this.limit
+      const query = this.customQuery
+        ? this.customQuery : this.buildQuery({ category: this.category })
 
       const orderBy = get(this.$route, 'meta.order', 'trending')
 
@@ -98,50 +101,40 @@ export default {
         attempt(done)
         this.$refs.infiniteScroll.stop()
       }
+    },
+    buildQuery () {
+      this.query = []
+      if (this.category) {
+        this.query.concat(['json_metadata.utopian.category', '==', this.category])
+      }
+
+      if (this.projectId) {
+        this.query.concat(['json_metadata.utopian.projectId', '==', this.projectId])
+      }
     }
   },
 
-  // computed properties.
   computed: {
-
-    // compute available categories (alias).
-    categories () {
-      return categories
-    },
-
-    // map the categories into a selectable array.
-    categoryOptions () {
-      return map(categoryOptions, (option) => {
-        // @TODO upper case should be handler at CSS level, not runtime transformations.
-        option.label = option.label.toUpperCase()
-        return option
-      })
-    },
-
-    // currently selected category filter.
-    currentCategory () {
-      return get(this.$route, 'params.category', null)
-    }
   },
 
-  // mounted hook.
   mounted () {
-    // start sort and category from route, defaulting to trending, all categories.
-    this.sortBy = get(this.$route, 'meta.order', 'trending')
-    this.category = get(this.$route, 'params.category', 'utopian-io')
-
-    // load initial content.
     this.loadInitial()
-
-    // just return something to be polite.
-    return true
   },
 
   // watchers.
   watch: {
 
     // reload the data as the category changes.
-    currentCategory () {
+    category () {
+      this.loadInitial()
+    },
+    projectId () {
+      this.loadInitial()
+    },
+    orderBy () {
+      this.loadInitial()
+    },
+    customQuery () {
       this.loadInitial()
     }
   }
