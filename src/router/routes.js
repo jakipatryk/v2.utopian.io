@@ -47,7 +47,8 @@ export default [
         component: () => import('src/pages/project/project'),
         children: [
           {path: 'details', name: 'project.details', component: () => import('src/pages/project/details/details')},
-          {path: 'contributions', name: 'project.contributions', component: () => import('src/pages/project/contributions/contributions')},
+          {path: 'contributions', redirect: 'contributions/all'},
+          {path: 'contributions/:category', name: 'project.contributions', component: () => import('src/pages/project/contributions/contributions')},
           {path: 'tasks', name: 'project.tasks', component: () => import('src/pages/project/tasks/tasks')}
         ]
       },
